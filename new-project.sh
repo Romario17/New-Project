@@ -20,9 +20,9 @@ cyanClaro="\033[1;36m"
 branco="\033[1;37m"
 #################################################################################
 
-Makefile=https://api.cacher.io/raw/94f8813e4bed23eb269c/e00d93676e72cd3c5193/makefile
-Main_CPP=https://api.cacher.io/raw/0ef8471e8bd67a72a93d/6b85823d73743e6a5fe9/main.cpp
-Colors_hpp=https://api.cacher.io/raw/701708781e87d75c2f73/3b85b94d53fb44c9b9f5/colors.hpp
+Makefile=https://gist.githubusercontent.com/Romario17/ed73ca48f38c8cf08a6c54bfc97bd498/raw/f270949eea6522ef7abeca7345e8ede816232b82/makefile
+Main_CPP=https://gist.githubusercontent.com/Romario17/b084f2a6655430fd003b23e0948e65b1/raw/6471c11cabb2937c7416911abb0a443e824ade59/main.cpp
+Colors_hpp=https://gist.githubusercontent.com/Romario17/e2a7ad6006cc605d4578f7660009bcb9/raw/7a09f73772f810525a2b331dbd3f9fbb1f8f0f3a/colors.hpp
 
 src=src
 main=main.cpp
