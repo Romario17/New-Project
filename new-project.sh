@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ################### Constants variables ######################
 # colors
@@ -67,9 +67,9 @@ function create-file-codes ()
     
     if [ -e "$MAIN" ]
     then
-        echo -e "$WHITE\t\t$1/$SRC/$MAIN -->$LIGHT_GREEN OK$DEFAULT"
+        echo -e "$WHITE\t\t$1/src/$MAIN -->$LIGHT_GREEN OK$DEFAULT"
     else
-        echo -e "$WHITE\t\t$1/$SRC/$MAIN -->$LIGHT_RED NO$DEFAULT"
+        echo -e "$WHITE\t\t$1/src/$MAIN -->$LIGHT_RED NO$DEFAULT"
     fi
     
     cd .. && wget ${URL_TABLE["makefile"]} -q
@@ -83,9 +83,7 @@ function create-file-codes ()
 }
 
 function create-project ()
-{
-    local declare -A RETURN_TABLE
-    
+{    
     create-directories $1
     
     case $? in
