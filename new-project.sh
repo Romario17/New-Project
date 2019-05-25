@@ -1,89 +1,141 @@
-#!/bin/bash
+#!/bin/sh
 
-# Colors
-corPadrao="\033[0m"
-preto="\033[0;30m"
-vermelho="\033[0;31m"
-verde="\033[0;32m"
-marrom="\033[0;33m"
-azul="\033[0;34m"
-purple="\033[0;35m"
-cyan="\033[0;36m"
-cinzaClaro="\033[0;37m"
-pretoCinza="\033[1;30m"
-vermelhoClaro="\033[1;31m"
-verdeClaro="\033[1;32m"
-amarelo="\033[1;33m"
-azulClaro="\033[1;34m"
-purpleClaro="\033[1;35m"
-cyanClaro="\033[1;36m"
-branco="\033[1;37m"
+################### Constants variables ######################
+# colors
+readonly DEFAULT="\033[0m"
+readonly BLACK="\033[0;30m"
+readonly RED="\033[0;31m"
+readonly GREEN="\033[0;32m"
+readonly BLUE="\033[0;34m"
+readonly MAGENTA="\033[0;35m"
+readonly CYAN="\033[0;36m"
+readonly LIGHT_RED="\033[1;31m"
+readonly LIGHT_GREEN="\033[1;32m"
+readonly YELLOW="\033[1;33m"
+readonly LIGHT_BLUE="\033[1;34m"
+readonly LIGHT_MAGENTA="\033[1;35m"
+readonly LIGHT_CYAN="\033[1;36m"
+readonly WHITE="\033[1;37m"
+
+declare -A ERROR_MESSAGES
+ERROR_MESSAGES["create-directories"]=$LIGHT_RED"Error: Falha na criação da estrutura de diretório!!!"$DEFAULT
+ERROR_MESSAGES["create-file-codes"]=$YELLOW"Warning: Falha ao baixar um\vários arquivo(s) de código!!!"$DEFAULT
+readonly ERROR_MESSAGES
+
+declare -A URL_TABLE
+URL_TABLE["makefile"]=https://gist.githubusercontent.com/Romario17/ed73ca48f38c8cf08a6c54bfc97bd498/raw/f270949eea6522ef7abeca7345e8ede816232b82/makefile
+URL_TABLE["main-cpp"]=https://gist.githubusercontent.com/Romario17/2254db67239976af01570134bd65fe50/raw/4ae82b34c23161176f5c5d4927de1c95f5e1546a/main.cpp
+URL_TABLE["color-hpp"]=https://gist.githubusercontent.com/Romario17/e2a7ad6006cc605d4578f7660009bcb9/raw/7a09f73772f810525a2b331dbd3f9fbb1f8f0f3a/colors.hpp
+readonly URL_TABLE
+
+readonly MAIN=main.cpp
+
+# boolean
+readonly TRUE=0
+readonly FALSE=1
 #################################################################################
 
-Makefile=https://gist.githubusercontent.com/Romario17/ed73ca48f38c8cf08a6c54bfc97bd498/raw/f270949eea6522ef7abeca7345e8ede816232b82/makefile
-Main_CPP=https://gist.githubusercontent.com/Romario17/b084f2a6655430fd003b23e0948e65b1/raw/6471c11cabb2937c7416911abb0a443e824ade59/main.cpp
-Colors_hpp=https://gist.githubusercontent.com/Romario17/e2a7ad6006cc605d4578f7660009bcb9/raw/7a09f73772f810525a2b331dbd3f9fbb1f8f0f3a/colors.hpp
-
-src=src
-main=main.cpp
-
-#################################################################################
 function create-directories ()
 {
-    echo -e "$azulClaro\tCriando Diretórios ...$corPadrao\n"
-    mkdir $1 && echo -e "$branco\t\t$1 -->$verdeClaro OK$corPadrao"
-    mkdir $1/debug && echo -e "$branco\t\t$1/debug -->$verdeClaro OK$corPadrao"
-    mkdir $1/include && echo -e "$branco\t\t$1/include -->$verdeClaro OK$corPadrao"
-    mkdir $1/obj && echo -e "$branco\t\t$1/obj -->$verdeClaro OK$corPadrao"
-    mkdir $1/$src && echo -e "$branco\t\t$1/$src -->$verdeClaro OK$corPadrao"
+    local readonly DIRS=($1 $1/debug $1/include $1/obj $1/src)
+    
+    echo -e "$LIGHT_BLUE\tCriando Diretórios ...$DEFAULT\n"
+    
+    for((i=0;i<${#DIRS[@]};i++))
+    do
+        if mkdir ${DIRS[$i]} 2>/dev/null
+        then
+            echo -e "$WHITE\t\t${DIRS[$i]} -->$LIGHT_GREEN OK$DEFAULT"
+        else
+            echo -e "$WHITE\t\t${DIRS[$i]} -->$LIGHT_RED NO$DEFAULT"
+        fi
+    done
+    
+    if [ -e $1 ]
+    then
+        return $TRUE
+    else
+        return $FALSE
+    fi
 }
 
 function create-file-codes ()
 {
-    echo -e "\n$azulClaro\tBaixando arquivos do projeto ...$corPadrao\n"
-
-    cd $1/$src && wget $Main_CPP -q
-    cd .. && wget $Makefile -q
-
-    if [ -e "$src/$main" ]
+    echo -e "\n$LIGHT_BLUE\tBaixando arquivos do projeto ...$DEFAULT\n"
+    
+    cd src && wget ${URL_TABLE["main-cpp"]} -q
+    
+    if [ -e "$MAIN" ]
     then
-        echo -e "$branco\t\t$1/$src/$main -->$verdeClaro OK$corPadrao"
+        echo -e "$WHITE\t\t$1/$SRC/$MAIN -->$LIGHT_GREEN OK$DEFAULT"
     else
-        echo -e "$branco\t\t$1/$src/$main -->$vermelhoClaro NO$corPadrao"
+        echo -e "$WHITE\t\t$1/$SRC/$MAIN -->$LIGHT_RED NO$DEFAULT"
     fi
-
+    
+    cd .. && wget ${URL_TABLE["makefile"]} -q
+    
     if [ -e "makefile" ]
     then
-        echo -e "$branco\t\t$1/makefile -->$verdeClaro OK$corPadrao"
+        echo -e "$WHITE\t\t$1/makefile -->$LIGHT_GREEN OK$DEFAULT"
     else
-        echo -e "$branco\t\t$1/makefile -->$vermelhoClaro NO$corPadrao"
+        echo -e "$WHITE\t\t$1/makefile -->$LIGHT_RED NO$DEFAULT"
     fi
-
-    cd ..
 }
 
 function create-project ()
 {
+    local declare -A RETURN_TABLE
+    
     create-directories $1
-    create-file-codes $1
+    
+    case $? in
+        $TRUE)
+            cd $1
+            create-file-codes $1
+
+            case $? in
+                $TRUE)
+                    return $TRUE
+                ;;
+                $FALSE)
+                    return $FALSE
+                ;;
+            esac
+        ;;
+        $FALSE)
+            return $FALSE
+        ;;
+    esac
 }
 #################################################################################
 
-# verifica se o número de argumentos é menor que 1
-if [ $# -lt 1 ]
-then
-    echo -e "$vermelhoClaro Nenhum argumento foi passado! $corPadrao"
-    echo -e " ----> Ex:$verdeClaro bash$corPadrao new-project.sh$branco my-project$corPadrao"
-    exit 1
-fi
+function main ()
+{
+    # verifica se o número de argumentos é menor que 1
+    if [ $# -lt 1 ]
+    then
+        echo -e "$LIGHT_RED Nenhum argumento foi passado! $DEFAULT"
+        echo -e " ----> Ex:$LIGHT_GREEN bash$DEFAULT new-project.sh$WHITE my-project$DEFAULT"
+        exit 1
+    fi
+    
+    # verifica se há um diretório com o mesmo nome do argumento passado
+    if [ -e $1 ]
+    then
+        echo -e "$LIGHT_RED Diretório $WHITE $1 $LIGHT_RED já existe! $DEFAULT"
+        exit 1
+    else
+        echo -e "$YELLOW\nCriando Projeto ... $DEFAULT\n"
+        
+        create-project $1
+        
+        if [ $? -eq $TRUE ]
+        then
+            echo -e "$LIGHT_GREEN\nProjeto criado com Sucesso!!!$DEFAULT\n"
+        else
+            echo -e "$LIGHT_RED\nFalha na criação do Projeto!!!$DEFAULT\n"
+        fi
+    fi
+}
 
-# verifica se há um diretório com o mesmo nome do argumento passado
-if [ -e $1 ]
-then
-    echo -e "$vermelhoClaro Diretório $branco $1 $vermelhoClaro já existe! $corPadrao"
-    exit 1
-else
-    echo -e "$amarelo\nCriando Projeto ... $corPadrao\n"
-    create-project $1
-    echo -e "$verdeClaro\nProcesso terminado!!!$corPadrao\n"
-fi
+main $*
