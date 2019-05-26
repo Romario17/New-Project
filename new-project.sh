@@ -80,6 +80,18 @@ function create-file-codes ()
     else
         echo -e "$WHITE\t\t$1/makefile -->$LIGHT_RED NO$DEFAULT"
     fi
+
+    if [ -e "makefile" ]
+    then
+        if [ -e "src/$MAIN" ]
+        then
+            return $TRUE
+        else
+            return $FALSE
+        fi
+    else
+        return $FALSE
+    fi
 }
 
 function create-project ()
@@ -90,15 +102,7 @@ function create-project ()
         $TRUE)
             cd $1
             create-file-codes $1
-
-            case $? in
-                $TRUE)
-                    return $TRUE
-                ;;
-                $FALSE)
-                    return $FALSE
-                ;;
-            esac
+            return $?
         ;;
         $FALSE)
             return $FALSE
